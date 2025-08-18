@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação Creator QRCode</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Favicon SVG -->
+    <link rel="icon" type="image/svg+xml" href="img/logo_webcash.png">
+    
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --bg-color: #ffffff;
+            --text-color: #2c3e50;
+            --code-bg: #f8f9fa;
+            --sidebar-bg: #ffffff;
+            --sidebar-text: #2c3e50;
+            --sidebar-hover-bg: #f8f9fa;
+            --sidebar-active-bg: #e3f2fd;
+            --sidebar-active-text: #1976d2;
+            --highlight-color: #e74c3c;
+            --border-color: #e1e5e9;
+            --table-even-bg: #f8f9fa;
+            --table-header-bg: #2c3e50;
+            --table-header-text: #ffffff;
+            --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.08);
+            --shadow-medium: 0 4px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        body.dark-mode {
+            --bg-color: #1a1a1a;
+            --text-color: #e4e4e7;
+            --secondary-color: #f4f4f5;
+            --code-bg: #2a2a2a;
+            --sidebar-bg: #2a2a2a;
+            --sidebar-text: #e4e4e7;
+            --sidebar-hover-bg: #3a3a3a;
+            --sidebar-active-bg: #1e3a8a;
+            --sidebar-active-text: #60a5fa;
+            --border-color: #3a3a3a;
+            --table-even-bg: #2a2a2a;
+            --table-header-bg: #1f2937;
+            --table-header-text: #f9fafb;
+            --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.3);
+            --shadow-medium: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--bg-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1002;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: var(--shadow-light);
+            backdrop-filter: blur(10px);
+        }
+
+        header .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        header .logo-container .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary-color), #2980b9);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-light);
+        }
+
+        header .logo-container .logo-text {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        header .dark-mode-toggle {
+            background: var(--sidebar-hover-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 0.6rem 0.8rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 80px;
+            justify-content: center;
+        }
+
+        header .dark-mode-toggle:hover {
+            background-color: var(--sidebar-active-bg);
+            color: var(--sidebar-active-text);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        nav {
+            width: 300px;
+            background-color: var(--sidebar-bg);
+            height: 100vh;
+            overflow-y: auto;
+            padding: 5.5rem 1.5rem 2rem 1.5rem;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1001;
+            border-right: 1px solid var(--border-color);
+            box-shadow: var(--shadow-light);
+        }
+
+        nav h1 {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        nav ul li {
+            margin: 0.5rem 0;
+        }
+
+        nav ul li a {
+            color: var(--sidebar-text);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            display: block;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            border: 1px solid transparent;
+        }
+
+        nav ul li a:hover {
+            background-color: var(--sidebar-hover-bg);
+            color: var(--text-color);
+            border-color: var(--border-color);
+            transform: translateX(4px);
+        }
+
+        nav ul li a.active {
+            background-color: var(--sidebar-active-bg);
+            color: var(--sidebar-active-text);
+            border-color: var(--primary-color);
+            font-weight: 600;
+            box-shadow: var(--shadow-light);
+        }
+
+        main {
+            margin-left: 300px;
+            padding: 5rem 3rem 6rem 3rem;
+            max-width: 1000px;
+            flex-grow: 1;
+        }
+
+        h1, h2, h3 {
+            color: var(--secondary-color);
+            margin-top: 2.5rem;
+            font-weight: 700;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-top: 3rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        p {
+            margin: 1.2rem 0;
+            font-size: 1rem;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            font-size: 0.9rem;
+            border-left: 4px solid var(--primary-color);
+            font-family: 'Courier New', monospace;
+            box-shadow: var(--shadow-light);
+        }
+
+        code {
+            background-color: var(--code-bg);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        pre code {
+            background-color: transparent;
+            padding: 0;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 1.5rem 0;
+            box-shadow: var(--shadow-light);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        th, td {
+            padding: 1rem 1.2rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--table-header-bg);
+            color: var(--table-header-text);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        tr:nth-child(even) {
+            background-color: var(--table-even-bg);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        a.chapter-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s ease;
+        }
+
+        a.chapter-link:hover {
+            border-bottom-color: var(--primary-color);
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary-color);
+            padding: 1.5rem 1.5rem 1.5rem 2rem;
+            color: var(--text-color);
+            margin: 2rem 0;
+            font-style: italic;
+            background-color: var(--code-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow-light);
+        }
+
+        .overview {
+            background: linear-gradient(135deg, var(--code-bg), var(--bg-color));
+            border-left: 4px solid var(--highlight-color);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-medium);
+        }
+
+        hr {
+            border: none;
+            border-top: 2px solid var(--border-color);
+            margin: 4rem 0;
+            opacity: 0.6;
+        }
+
+        .mermaid {
+            background-color: var(--bg-color);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow-medium);
+            border: 1px solid var(--border-color);
+            margin: 2rem 0;
+        }
+
+        ul, ol {
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            text-align: center;
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+            z-index: 1002;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 1024px) {
+            nav {
+                width: 280px;
+            }
+            
+            main {
+                margin-left: 280px;
+                padding: 4rem 2rem 6rem 2rem;
+            }
+        }
+
+        @media (max-width: 900px) {
+            nav {
+                display: none;
+            }
+
+            main {
+                margin-left: 0;
+                padding: 5rem 1.5rem 6rem 1.5rem;
+            }
+
+            header {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.7rem;
+            }
+        }
+
+        /* Scrollbar personalizada */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <div class="logo-icon">
+                    <img src="img/logo_webcash.png" alt="Logo Creator QRCode" style="width: 34px; height: 34px;">
+                </div>
+                <span class="logo-text">Creator QRCode</span>
+            </div>
+            <button class="dark-mode-toggle" onclick="toggleDarkMode()">
+                <span id="theme-icon">🌙</span>
+                <span id="theme-text">Dark</span>
+            </button>
+        </header>
+
+        <nav id="sidebar">
+            <h1>Documentação</h1>
+            <ul>
+                <li><a href="#overview">Visão Geral</a></li>
+                <li><a href="#chapter1">Capítulo 1: CLI</a></li>
+                <li><a href="#chapter2">Capítulo 2: Orquestrador</a></li>
+                <li><a href="#chapter3">Capítulo 3: Input de URLs</a></li>
+                <li><a href="#chapter4">Capítulo 4: Renderizador QR</a></li>
+                <li><a href="#chapter5">Capítulo 5: Handler de Arquivos</a></li>
+            </ul>
+        </nav>
+
+        <main id="main-content">
+            <section id="overview" class="overview">
+                <h1>Documentação - Creator QRCode</h1>
+                <p>O <code>Creator QRCode</code> é uma ferramenta projetada para <strong>gerar QR codes em lote</strong> a partir de diversas entradas de texto. Ele pode ler links ou qualquer texto simples da linha de comando, de um arquivo, de uma planilha CSV ou até mesmo de dados "piped", transformando cada entrada em uma imagem de QR code escaneável e salvando-a como um arquivo PNG em uma pasta organizada.</p>
+                <hr style="margin: 1.5rem 0;">
+                <h2>Visão Geral do Fluxo</h2>
+                <div class="mermaid">
+                    flowchart TD
+                        A0["Gerenciamento de Entrada de URLs"]
+                        A1["Renderizador de QR Code"]
+                        A2["Handler de Arquivos de Saída"]
+                        A3["Interface de Linha de Comando (CLI)"]
+                        A4["Orquestrador do Fluxo de Trabalho"]
+                        A3 -- "Fornece argumentos analisados" --> A4
+                        A4 -- "Solicita a coleta de URLs" --> A0
+                        A0 -- "Fornece URLs coletadas" --> A4
+                        A4 -- "Dispara a geração de QR" --> A1
+                        A4 -- "Prepara diretório de saída" --> A2
+                        A1 -- "Sanitiza nomes de arquivos" --> A2
+                </div>
+            </section>
+
+            <hr>
+
+            <section id="chapter1">
+                <h1>Capítulo 1: Command Line Interface (CLI)</h1>
+                <p>Bem-vindo ao tutorial do projeto <code>Creator_QRCode</code>! Neste primeiro capítulo, vamos desvendar o mistério por trás da <strong>Interface de Linha de Comando (CLI)</strong>. Pense na CLI como o "painel de controle" do seu programa, a forma como você, o usuário, dá instruções diretas para o nosso gerador de QR code sobre o que fazer.</p>
+                <h3>O que a CLI resolve?</h3>
+                <p>Imagine que você tem um robô super inteligente que cria QR codes. Como você diria a ele: 1. "Crie um QR code para meu site: <code>https://meuprojetomaneiro.com</code>"; 2. "Salve-o em uma pasta especial chamada <code>meus_qrs</code>"; 3. "Faça o QR code bem grande, escale-o para <code>10</code>!".</p>
+                <p>Sem uma CLI, você teria que mudar linhas de código dentro do programa toda vez que quisesse criar um QR code diferente. Isso seria tedioso e confuso! A CLI resolve isso permitindo que você digite instruções simples diretamente no terminal do seu computador, como se estivesse conversando com o robô.</p>
+                <h3>Seu Primeiro Comando: Gerando um QR Code</h3>
+                <p>Vamos começar com um exemplo prático. Nosso programa se chama <code>qr_batch_generator.py</code>. Para usá-lo, você abre um terminal (no Windows, pode ser o PowerShell ou Prompt de Comando; no macOS/Linux, geralmente é chamado de Terminal ou Konsole). Uma vez aberto, navegue até a pasta onde o <code>qr_batch_generator.py</code> está salvo e digite seu primeiro comando:</p>
+                <pre><code>python qr_batch_generator.py "https://www.exemplo.com"</code></pre>
+                <p>O que acontece quando você pressiona Enter?</p>
+                <ul>
+                    <li><code>python</code>: Diz ao seu computador para executar um programa Python.</li>
+                    <li><code>qr_batch_generator.py</code>: O nome do nosso programa.</li>
+                    <li><code>"https://www.exemplo.com"</code>: O **input** que você está dando ao programa – o link que você quer transformar em um QR code.</li>
+                </ul>
+                <p>Depois de executar isso, você encontrará uma nova pasta chamada <code>qrcodes</code> (por padrão) no mesmo diretório, contendo uma nova e brilhante imagem de QR code para <code>https://www.exemplo.com</code>!</p>
+                <h3>Entendendo os "Botões" da CLI</h3>
+                <p>A CLI não serve apenas para fornecer entrada. Ela também permite que você ajuste configurações. Essas configurações são frequentemente chamadas de **opções** ou **flags**. Elas geralmente começam com um traço duplo (<code>--</code>) ou um traço simples (<code>-</code>) seguido de uma letra curta.</p>
+                <p>Vamos ver alguns "botões" importantes para o <code>Creator_QRCode</code>:</p>
+                <table>
+                    <tr><th>Botão</th><th>O que ele faz</th><th>Exemplo de uso</th></tr>
+                    <tr><td><code>urls</code></td><td>Os links que você quer transformar em QR codes.</td><td><code>python programa.py "link1"</code></td></tr>
+                    <tr><td><code>--outdir</code> (<code>-o</code>)</td><td>Onde salvar as imagens dos QR codes.</td><td><code>--outdir meus_qrs</code></td></tr>
+                    <tr><td><code>--scale</code></td><td>Quão grande a imagem do QR code deve ser.</td><td><code>--scale 10</code></td></tr>
+                    <tr><td><code>--border</code></td><td>Quanto espaço em branco colocar ao redor do QR code.</td><td><code>--border 6</code></td></tr>
+                    <tr><td><code>--input</code> (<code>-i</code>)</td><td>Ler links de um arquivo de texto ou CSV.</td><td><code>--input links.txt</code></td></tr>
+                </table>
+                <p><strong>Exemplo:</strong> Digamos que você queira gerar um QR code para <code>https://docs.python.org</code> que seja muito grande e salvo em uma pasta chamada <code>qrs_python</code>.</p>
+                <pre><code>python qr_batch_generator.py "https://docs.python.org" --outdir qrs_python --scale 15</code></pre>
+                <p>Aqui:</p>
+                <ul>
+                    <li><code>"https://docs.python.org"</code> é o link (**argumento**).</li>
+                    <li><code>--outdir qrs_python</code> usa a **opção** <code>--outdir</code> para especificar a pasta de saída.</li>
+                    <li><code>--scale 15</code> usa a **opção** <code>--scale</code> para tornar o QR code maior.</li>
+                </ul>
+                <p>A CLI pega todas essas informações e as organiza de forma clara para o programa usar.</p>
+            </section>
+
+            <hr>
+
+            <section id="chapter2">
+                <h1>Capítulo 2: Orquestrador de Fluxo de Trabalho da Aplicação</h1>
+                <p>No Capítulo 1, você aprendeu a ser o chefe, dizendo ao nosso programa o que fazer usando comandos. Mas o que acontece *depois* que você aperta um botão nesse controle remoto? É aí que entra o **Orquestrador de Fluxo de Trabalho**!</p>
+                <h3>O que o Orquestrador resolve?</h3>
+                <p>Imagine que você está construindo uma nave de LEGO. Você tem as instruções (da CLI), um monte de peças (suas URLs) e ferramentas para juntá-las (o gerador de QR code). Quem garante que você vai ler as instruções primeiro, encontrar todas as peças certas, construir cada parte corretamente e juntar tudo no final?</p>
+                <p>Esse "quem" é o **Orquestrador de Fluxo de Trabalho**. Ele é o "gerente de projeto" ou o "cérebro" do nosso programa. Ele pega suas instruções da CLI e garante que cada passo da geração do QR code aconteça na ordem correta, do começo ao fim. Sem ele, o programa seria como um trabalhador que recebe as instruções mas não sabe o que fazer primeiro!</p>
+                <h3>O Trabalho do Orquestrador: Um Plano de Alto Nível</h3>
+                <p>O trabalho do Orquestrador pode ser dividido nestes passos principais:</p>
+                <ol>
+                    <li><strong>Ouvir as Instruções:</strong> Ele ouve atentamente o que você digitou no terminal, entendendo os links e as configurações escolhidas.</li>
+                    <li><strong>Coletar Todas as URLs:</strong> Ele garante que tem todos os links para converter, chamando a parte do programa de <a href="#chapter3" class="chapter-link">Gerenciamento de Entrada de URLs</a> para fazer isso.</li>
+                    <li><strong>Criar os QR Codes (Um por Um):</strong> Para cada link coletado, o Orquestrador pede ao <a href="#chapter4" class="chapter-link">Renderizador de QR Code</a> para desenhar a imagem.</li>
+                    <li><strong>Salvar e Relatar:</strong> Ele garante que os arquivos sejam salvos corretamente, trabalhando com o <a href="#chapter5" class="chapter-link">Manipulador de Arquivos de Saída</a>. Por fim, ele relata a você o que aconteceu: quais QR codes foram criados e onde foram salvos.</li>
+                </ol>
+                <h3>Um Olhar por Dentro: A Função `main`</h3>
+                <p>Na nossa arquitetura, a função <code>main</code> é o coração do nosso Orquestrador. É lá que todos os passos que discutimos são colocados em prática.</p>
+                <pre><code># Parte da função main()
+# 1. Ouvir as Instruções (da CLI)
+args = parser.parse_args(argv)
+
+# 2. Coletar Todas as URLs
+urls = collect_urls(args)
+
+# 3. Preparar a pasta de saída
+outdir = Path(args.outdir)
+outdir.mkdir(parents=True, exist_ok=True)
+
+# 4. Criar QR Codes (Um por um)
+for u in urls:
+    try:
+        p = generate_qr_png(u, outdir, ...)
+        # ... e salvar o arquivo
+    except Exception as e:
+        print(f"[ERRO] Falha ao gerar QR para '{u}': {e}")
+
+# 5. Relatar o resultado final
+if created:
+    print(f"[OK] {len(created)} QR Code(s) gerado(s) em: {outdir.resolve()}")
+else:
+    print("[ERRO] Nenhum arquivo gerado.")</code></pre>
+                <p>Este código simplificado mostra como o Orquestrador orquestra a chamada de cada componente, garantindo que tudo funcione em sequência e tratando erros no processo.</p>
+            </section>
+
+            <hr>
+
+            <section id="chapter3">
+                <h1>Capítulo 3: Gerenciamento de Entrada de URLs</h1>
+                <p>O sistema coleta e organiza as URLs ou textos que serão transformados em QR codes. Ele elimina duplicatas, limpa dados e garante que cada link esteja pronto para a próxima etapa.</p>
+                <h3>O Que o Gerenciamento de Entrada de URLs Resolve?</h3>
+                <p>O componente de Gerenciamento de Entrada de URLs é como seu "Preparador de Ingredientes" dedicado. O trabalho dele é ir a diferentes fontes (linha de comando, arquivos, entrada `piped`), juntar todos os links, remover duplicatas e filtrar o que não é necessário, entregando uma lista limpa e pronta para o próximo passo.</p>
+                <h3>Formas de fornecer URLs:</h3>
+                <ul>
+                    <li>Diretamente na linha de comando</li>
+                    <li>Arquivo de texto (.txt)</li>
+                    <li>Coluna específica de CSV</li>
+                    <li>Entrada "piped" (stdin)</li>
+                </ul>
+                <p>Exemplo de arquivo CSV:</p>
+                <pre><code>ProductID,Name,Price,URL
+101,Laptop,1200,https://shop.com/laptop
+102,Mouse,25,https://shop.com/mouse
+103,Keyboard,75,https://shop.com/keyboard</code></pre>
+                <p>Função central: <code>collect_urls</code></p>
+                <p>Você pode também gerar QR codes para texto simples usando a opção <code>--allow-plain</code>.</p>
+                <pre><code>python qr_batch_generator.py "Olá Mundo" --allow-plain</code></pre>
+            </section>
+
+            <hr>
+
+            <section id="chapter4">
+                <h1>Capítulo 4: Renderizador de QR Code</h1>
+                <p>O Renderizador é o "artista" do projeto. Ele transforma URLs ou textos em QR codes usando a biblioteca <code>segno</code>, aplicando tamanho, borda e correção de erros.</p>
+                <h3>O Que o Renderizador de QR Code Resolve?</h3>
+                <p>O Renderizador é o "artista" ou "pintor" do nosso projeto. Ele pega os dados brutos (como "https://meusite.com") e os transforma na imagem quadrada e pixelada familiar que chamamos de QR code, usando a biblioteca <strong>`segno`</strong>.</p>
+                <h3>Opções de estilo:</h3>
+                <table>
+                    <tr><th>Opção</th><th>Função</th><th>Exemplo</th></tr>
+                    <tr><td>--scale</td><td>Tamanho do QR code</td><td>10</td></tr>
+                    <tr><td>--border</td><td>Espaço em branco ao redor</td><td>6</td></tr>
+                    <tr><td>--ecc</td><td>Correção de erro (l,m,q,h)</td><td>h</td></tr>
+                </table>
+                <pre><code>python qr_batch_generator.py "https://example.com/art" --scale 15 --border 8 --ecc h</code></pre>
+                <blockquote>O Renderizador pega seu dado e cria a arte final em QR code, garantindo que seja escaneável e durável.</blockquote>
+                <p>Função central: <code>generate_qr_png(data, outdir, prefix, scale, border, ecc)</code></p>
+            </section>
+
+            <hr>
+
+            <section id="chapter5">
+                <h1>Capítulo 5: Manipulador de Arquivos de Saída</h1>
+                <p>O Manipulador de arquivos é o "arquivista" que organiza todos os QR codes gerados, garantindo que sejam salvos em pastas corretas com nomes seguros e opcionais prefixos.</p>
+                <h3>O Que o Manipulador de Arquivos de Saída Resolve?</h3>
+                <p>O Manipulador de Arquivos de Saída é como um "arquivista" para seus QR codes gerados. O trabalho dele é garantir que haja uma pasta de destino, dar a cada arquivo um nome seguro e descritivo e, por fim, salvá-lo corretamente.</p>
+                <h3>Opções de saída:</h3>
+                <table>
+                    <tr><th>Opção</th><th>Função</th><th>Exemplo</th></tr>
+                    <tr><td>--outdir (-o)</td><td>Pasta onde os QR codes serão salvos</td><td>my_qrs</td></tr>
+                    <tr><td>--prefix</td><td>Prefixo nos nomes dos arquivos</td><td>link_</td></tr>
+                </table>
+                <pre><code>python qr_batch_generator.py "https://example.com/project" --outdir final_qrs --prefix proj_</code></pre>
+                <blockquote>O Handler garante que cada arquivo seja único, organizado e fácil de localizar, evitando conflitos e problemas de salvamento.</blockquote>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Creator_QRCode. Todos os direitos reservados. | <a href="https://github.com/WebCash-inc" target="_blank">Visite nosso GitHub</a></p>
+    </footer>
+
+    <script src="https://unpkg.com/mermaid@10.9.1/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: document.body.classList.contains('dark-mode') ? 'dark' : 'default'
+        });
+
+        const sections = document.querySelectorAll('main section');
+        const navLinks = document.querySelectorAll('nav ul li a');
+
+        function setActiveLink() {
+            let current = 'overview';
+            const offset = 150;
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.offsetHeight;
+                if (window.scrollY >= sectionTop - offset && window.scrollY < sectionTop + sectionHeight - offset) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        function updateMermaidTheme() {
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            mermaid.initialize({ 
+                startOnLoad: true,
+                theme: isDarkMode ? 'dark' : 'default'
+            });
+            
+            // Rerender mermaid diagrams
+            const mermaidElements = document.querySelectorAll('.mermaid');
+            mermaidElements.forEach((element, index) => {
+                const graphDefinition = element.textContent;
+                element.innerHTML = '';
+                element.setAttribute('data-processed', 'false');
+                mermaid.render(`mermaid-${index}`, graphDefinition, (svgCode) => {
+                    element.innerHTML = svgCode;
+                });
+            });
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            
+            // Update button text and icon
+            const themeIcon = document.getElementById('theme-icon');
+            const themeText = document.getElementById('theme-text');
+            
+            if (isDarkMode) {
+                themeIcon.textContent = '☀️';
+                themeText.textContent = 'Light';
+            } else {
+                themeIcon.textContent = '🌙';
+                themeText.textContent = 'Dark';
+            }
+            
+            // Save preference
+            localStorage.setItem('darkMode', isDarkMode);
+            
+            // Update mermaid theme
+            setTimeout(updateMermaidTheme, 100);
+        }
+
+        // Smooth scrolling for navigation links
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) {
+                    const offsetTop = targetSection.offsetTop - 100;
+                    window.scrollTo({
+                        top: offsetTop,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Initialize
+        window.addEventListener('scroll', setActiveLink);
+        window.addEventListener('load', () => {
+            setActiveLink();
+            
+            // Load saved theme preference
+            const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+            if (savedDarkMode) {
+                document.body.classList.add('dark-mode');
+                document.getElementById('theme-icon').textContent = '☀️';
+                document.getElementById('theme-text').textContent = 'Light';
+            }
+            
+            updateMermaidTheme();
+        });
+
+        // Update active link on scroll
+        let ticking = false;
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                requestAnimationFrame(() => {
+                    setActiveLink();
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+    </script>
+</body>
+</html>
