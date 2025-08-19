@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     
     <!-- Favicon SVG -->
-    <link rel="icon" type="image/svg+xml" href="img/logo_webcash.png">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI2IiBmaWxsPSIjMzQ5OGRiIi8+CiAgPHJlY3QgeD0iNCIgeT0iNCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiByeD0iMiIgZmlsbD0iI2ZmZiIvPgogIDxyZWN0IHg9IjYiIHk9IjYiIHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9IiMzNDk4ZGIiLz4KICA8cmVjdCB4PSIyMiIgeT0iNiIgd2lkdGg9IjQiIGhlaWdodD0iNCIgZmlsbD0iIzM0OThkYiIvPgogIDxyZWN0IHg9IjYiIHk9IjIyIiB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjMzQ5OGRiIi8+CiAgPHJlY3QgeD0iMTIiIHk9IjgiIHdpZHRoPSI4IiBoZWlnaHQ9IjIiIGZpbGw9IiMzNDk4ZGIiLz4KICA8cmVjdCB4PSI4IiB5PSIxMiIgd2lkdGg9IjIiIGhlaWdodD0iOCIgZmlsbD0iIzM0OThkYiIvPgogIDxyZWN0IHg9IjE0IiB5PSIxNCIgd2lkdGg9IjQiIGhlaWdodD0iNCIgZmlsbD0iIzM0OThkYiIvPgogIDxyZWN0IHg9IjIwIiB5PSIxMiIgd2lkdGg9IjIiIGhlaWdodD0iOCIgZmlsbD0iIzM0OThkYiIvPgogIDxyZWN0IHg9IjEyIiB5PSIyMiIgd2lkdGg9IjgiIGhlaWdodD0iMiIgZmlsbD0iIzM0OThkYiIvPgo8L3N2Zz4K">
     
     <style>
         :root {
@@ -93,12 +93,19 @@
         header .logo-container .logo-icon {
             width: 32px;
             height: 32px;
-            background: linear-gradient(135deg, var(--primary-color), #2980b9);
             border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
             box-shadow: var(--shadow-light);
+            overflow: hidden;
+        }
+
+        header .logo-container .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
         }
 
         header .logo-container .logo-text {
@@ -419,7 +426,7 @@
         <header>
             <div class="logo-container">
                 <div class="logo-icon">
-                    <img src="img/logo_webcash.png" alt="Logo Creator QRCode" style="width: 34px; height: 34px;">
+                    <img src="img/logo_webcash.png" alt="Logo Creator QRCode">
                 </div>
                 <span class="logo-text">Creator QRCode</span>
             </div>
@@ -445,21 +452,87 @@
             <section id="overview" class="overview">
                 <h1>Documentação - Creator QRCode</h1>
                 <p>O <code>Creator QRCode</code> é uma ferramenta projetada para <strong>gerar QR codes em lote</strong> a partir de diversas entradas de texto. Ele pode ler links ou qualquer texto simples da linha de comando, de um arquivo, de uma planilha CSV ou até mesmo de dados "piped", transformando cada entrada em uma imagem de QR code escaneável e salvando-a como um arquivo PNG em uma pasta organizada.</p>
-                <hr style="margin: 1.5rem 0;">
-                <h2>Visão Geral do Fluxo</h2>
+                
+                <div style="margin: 2rem 0; padding: 1.5rem; background: var(--code-bg); border-radius: 8px; border-left: 4px solid var(--primary-color);">
+                    <h3 style="margin-top: 0; color: var(--primary-color);">🚀 Características Principais</h3>
+                    <ul style="margin-bottom: 0;">
+                        <li><strong>Múltiplas fontes de entrada:</strong> CLI, arquivos de texto, CSV e dados piped</li>
+                        <li><strong>Processamento em lote:</strong> Geração simultânea de centenas de QR codes</li>
+                        <li><strong>Configurações personalizáveis:</strong> Tamanho, bordas, correção de erro</li>
+                        <li><strong>Organização automática:</strong> Estrutura de pastas e nomenclatura inteligente</li>
+                    </ul>
+                </div>
+
+                <hr style="margin: 2.5rem 0; opacity: 0.3;">
+                
+                <h2 style="color: var(--secondary-color); margin-bottom: 1.5rem;">📊 Visão Geral da Arquitetura</h2>
+                <p style="margin-bottom: 2rem; color: var(--text-color); opacity: 0.9;">O Creator QRCode é estruturado em componentes modulares que trabalham em conjunto para processar entrada, gerar QR codes e organizar a saída de forma eficiente.</p>
+                
                 <div class="mermaid">
                     flowchart TD
-                        A0["Gerenciamento de Entrada de URLs"]
-                        A1["Renderizador de QR Code"]
-                        A2["Handler de Arquivos de Saída"]
-                        A3["Interface de Linha de Comando (CLI)"]
-                        A4["Orquestrador do Fluxo de Trabalho"]
-                        A3 -- "Fornece argumentos analisados" --> A4
-                        A4 -- "Solicita a coleta de URLs" --> A0
-                        A0 -- "Fornece URLs coletadas" --> A4
-                        A4 -- "Dispara a geração de QR" --> A1
-                        A4 -- "Prepara diretório de saída" --> A2
-                        A1 -- "Sanitiza nomes de arquivos" --> A2
+                        A3["🎮 Interface de Linha de Comando (CLI)<br/>Processa argumentos e opções"]
+                        A4["🎭 Orquestrador do Fluxo de Trabalho<br/>Coordena todo o processo"]
+                        A0["📥 Gerenciamento de Entrada de URLs<br/>Coleta e valida dados de entrada"]
+                        A1["🎨 Renderizador de QR Code<br/>Gera imagens QR usando Segno"]
+                        A2["📁 Handler de Arquivos de Saída<br/>Organiza e salva arquivos"]
+                        
+                        subgraph "Fontes de Entrada"
+                            F1["💬 URLs Diretas"]
+                            F2["📄 Arquivos .txt"]
+                            F3["📊 Planilhas CSV"]
+                            F4["⚡ Dados Piped"]
+                        end
+                        
+                        subgraph "Configurações"
+                            C1["📏 Escala"]
+                            C2["🖼️ Bordas"]
+                            C3["🔧 Correção de Erro"]
+                            C4["📂 Diretório de Saída"]
+                        end
+                        
+                        A3 --> A4
+                        A4 --> A0
+                        A0 --> A4
+                        A4 --> A1
+                        A4 --> A2
+                        A1 --> A2
+                        
+                        F1 --> A0
+                        F2 --> A0
+                        F3 --> A0
+                        F4 --> A0
+                        
+                        C1 --> A1
+                        C2 --> A1
+                        C3 --> A1
+                        C4 --> A2
+                        
+                        classDef primaryNode fill:#3498db,stroke:#2980b9,stroke-width:2px,color:#fff
+                        classDef inputNode fill:#27ae60,stroke:#229954,stroke-width:2px,color:#fff
+                        classDef configNode fill:#e74c3c,stroke:#c0392b,stroke-width:2px,color:#fff
+                        
+                        class A3,A4,A0,A1,A2 primaryNode
+                        class F1,F2,F3,F4 inputNode
+                        class C1,C2,C3,C4 configNode
+                </div>
+                
+                <div style="margin: 2rem 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                    <div style="padding: 1rem; background: var(--code-bg); border-radius: 8px; border-top: 3px solid var(--primary-color);">
+                        <h4 style="margin: 0 0 0.5rem 0; color: var(--primary-color);">🎮 CLI Interface</h4>
+                        <p style="margin: 0; font-size: 0.9rem; opacity: 0.8;">Processa comandos e configurações do usuário</p>
+                    </div>
+                    <div style="padding: 1rem; background: var(--code-bg); border-radius: 8px; border-top: 3px solid #27ae60;">
+                        <h4 style="margin: 0 0 0.5rem 0; color: #27ae60;">📥 Input Manager</h4>
+                        <p style="margin: 0; font-size: 0.9rem; opacity: 0.8;">Coleta URLs de múltiplas fontes</p>
+                    </div>
+                    <div style="padding: 1rem; background: var(--code-bg); border-radius: 8px; border-top: 3px solid #e74c3c;">
+                        <h4 style="margin: 0 0 0.5rem 0; color: #e74c3c;">🎨 QR Renderer</h4>
+                        <p style="margin: 0; font-size: 0.9rem; opacity: 0.8;">Transforma dados em QR codes</p>
+                    </div>
+                    <div style="padding: 1rem; background: var(--code-bg); border-radius: 8px; border-top: 3px solid #f39c12;">
+                        <h4 style="margin: 0 0 0.5rem 0; color: #f39c12;">📁 File Handler</h4>
+                        <p style="margin: 0; font-size: 0.9rem; opacity: 0.8;">Organiza e salva arquivos de saída</p>
+                    </div>
                 </div>
             </section>
 
@@ -611,7 +684,7 @@ else:
     </div>
 
     <footer>
-        <p>&copy; 2025 Creator_QRCode. Todos os direitos reservados. | <a href="https://github.com/WebCash-inc" target="_blank">Visite nosso GitHub</a></p>
+        <p>&copy; 2025 Creator QRCode. Todos os direitos reservados. | <a href="https://github.com/WebCash-inc" target="_blank">Visite nosso GitHub</a></p>
     </footer>
 
     <script src="https://unpkg.com/mermaid@10.9.1/dist/mermaid.min.js"></script>
