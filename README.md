@@ -1,7 +1,7 @@
 # Creator QRCode 🚀
 
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue.svg)](https://www.python.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/Barreto0620/Creator_QRCode?tab=MIT-1-ov-file)
 [![GitHub](https://img.shields.io/badge/GitHub-WebCash--inc-black.svg)](https://github.com/WebCash-inc)
 
 Uma ferramenta robusta e flexível para gerar QR codes em lote a partir de diversas fontes de dados.
@@ -170,7 +170,7 @@ Contribuições são bem-vindas! Se você encontrar um bug ou tiver uma ideia de
 
 ## 📄 Licença
 
-Este projeto é distribuído sob a Licença MIT. Veja o arquivo [LICENSE](https://www.google.com/search?q=LICENSE) para mais detalhes.
+Este projeto é distribuído sob a Licença MIT. Veja o arquivo [LICENSE](https://github.com/Barreto0620/Creator_QRCode?tab=MIT-1-ov-file) para mais detalhes.
 
 ## 📬 Contato
 
