@@ -1,113 +1,92 @@
-mermaid.initialize({ 
-    startOnLoad: true,
-    theme: document.body.classList.contains('dark-mode') ? 'dark' : 'default'
+// Tema (dark/light) com persistência
+const body = document.body;
+const themeToggle = document.getElementById('themeToggle');
+const themeIcon = document.getElementById('themeIcon');
+
+function applyTheme(theme) {
+  if (theme === 'dark') {
+    body.classList.add('dark');
+    themeIcon.textContent = '🌞';
+  } else {
+    body.classList.remove('dark');
+    themeIcon.textContent = '🌙';
+  }
+}
+
+(function initTheme() {
+  const saved = localStorage.getItem('cqrc_theme');
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  applyTheme(saved || (prefersDark ? 'dark' : 'light'));
+})();
+
+themeToggle.addEventListener('click', () => {
+  const next = body.classList.contains('dark') ? 'light' : 'dark';
+  localStorage.setItem('cqrc_theme', next);
+  applyTheme(next);
 });
 
-const sections = document.querySelectorAll('main section');
-const navLinks = document.querySelectorAll('nav ul li a');
+// Menu mobile
+const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('mobileOverlay');
 
-function setActiveLink() {
-    let current = 'overview';
-    const offset = 150;
-    
-    sections.forEach(section => {
-        const sectionTop = section.offsetTop;
-        const sectionHeight = section.offsetHeight;
-        if (window.scrollY >= sectionTop - offset && window.scrollY < sectionTop + sectionHeight - offset) {
-            current = section.getAttribute('id');
-        }
-    });
-
-    navLinks.forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href') === `#${current}`) {
-            link.classList.add('active');
-        }
-    });
+function toggleSidebar(forceOpen = null) {
+  const open = forceOpen !== null ? forceOpen : !sidebar.classList.contains('open');
+  sidebar.classList.toggle('open', open);
+  overlay.classList.toggle('active', open);
+  document.getElementById('main').classList.toggle('full-width', !open);
 }
 
-function updateMermaidTheme() {
-    const isDarkMode = document.body.classList.contains('dark-mode');
-    mermaid.initialize({ 
-        startOnLoad: true,
-        theme: isDarkMode ? 'dark' : 'default'
-    });
-    
-    // Rerender mermaid diagrams
-    const mermaidElements = document.querySelectorAll('.mermaid');
-    mermaidElements.forEach((element, index) => {
-        const graphDefinition = element.textContent;
-        element.innerHTML = '';
-        element.setAttribute('data-processed', 'false');
-        mermaid.render(`mermaid-${index}`, graphDefinition, (svgCode) => {
-            element.innerHTML = svgCode;
-        });
-    });
+mobileMenuBtn.addEventListener('click', () => toggleSidebar());
+overlay.addEventListener('click', () => toggleSidebar(false));
+
+// Scroll spy para destacar a seção ativa no menu
+const navLinks = Array.from(document.querySelectorAll('.nav-link'));
+const sections = navLinks.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+
+function onScrollSpy() {
+  const fromTop = window.scrollY + 140; // compensar header
+  let current = sections[0];
+
+  for (const sec of sections) {
+    if (sec.offsetTop <= fromTop) current = sec;
+  }
+  navLinks.forEach(link => link.classList.remove('active'));
+  const active = document.querySelector(`.nav-link[href="#${current.id}"]`);
+  if (active) active.classList.add('active');
 }
 
-function toggleDarkMode() {
-    document.body.classList.toggle('dark-mode');
-    const isDarkMode = document.body.classList.contains('dark-mode');
-    
-    // Update button text and icon
-    const themeIcon = document.getElementById('theme-icon');
-    const themeText = document.getElementById('theme-text');
-    
-    if (isDarkMode) {
-        themeIcon.textContent = '☀️';
-        themeText.textContent = 'Light';
-    } else {
-        themeIcon.textContent = '🌙';
-        themeText.textContent = 'Dark';
-    }
-    
-    // Save preference
-    localStorage.setItem('darkMode', isDarkMode);
-    
-    // Update mermaid theme
-    setTimeout(updateMermaidTheme, 100);
-}
+document.addEventListener('scroll', onScrollSpy, { passive: true });
+window.addEventListener('load', onScrollSpy);
 
-// Smooth scrolling for navigation links
+// Melhorar navegação (fecha menu ao clicar em item no mobile)
 navLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const targetId = link.getAttribute('href').substring(1);
-        const targetSection = document.getElementById(targetId);
-        if (targetSection) {
-            const offsetTop = targetSection.offsetTop - 100;
-            window.scrollTo({
-                top: offsetTop,
-                behavior: 'smooth'
-            });
-        }
-    });
+  link.addEventListener('click', () => {
+    if (window.innerWidth <= 768) toggleSidebar(false);
+  });
 });
 
-// Initialize
-window.addEventListener('scroll', setActiveLink);
-window.addEventListener('load', () => {
-    setActiveLink();
-    
-    // Load saved theme preference
-    const savedDarkMode = localStorage.getItem('darkMode') === 'true';
-    if (savedDarkMode) {
-        document.body.classList.add('dark-mode');
-        document.getElementById('theme-icon').textContent = '☀️';
-        document.getElementById('theme-text').textContent = 'Light';
-    }
-    
-    updateMermaidTheme();
-});
+// 🚀 Scripts Adicionados
 
-// Update active link on scroll
-let ticking = false;
+// Barra de Progresso de Leitura
+const progressBar = document.getElementById('progressBar');
 window.addEventListener('scroll', () => {
-    if (!ticking) {
-        requestAnimationFrame(() => {
-            setActiveLink();
-            ticking = false;
-        });
-        ticking = true;
-    }
+    const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const scrolled = window.scrollY;
+    const progress = (scrolled / docHeight) * 100;
+    progressBar.style.width = progress + '%';
+});
+
+// Botão de Voltar ao Topo
+const backToTopBtn = document.getElementById('backToTopBtn');
+window.addEventListener('scroll', () => {
+    if (window.scrollY > 300) {
+        backToTopBtn.style.display = 'block';
+    } else {
+        backToTopBtn.style.display = 'none';
+    }
+});
+
+backToTopBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 });
