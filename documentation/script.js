@@ -1,92 +1,196 @@
-// Tema (dark/light) com persistência
-const body = document.body;
-const themeToggle = document.getElementById('themeToggle');
-const themeIcon = document.getElementById('themeIcon');
+// Theme Management
+class ThemeManager {
+    constructor() {
+        this.theme = localStorage.getItem('cqrc_theme') || 
+                   (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        this.applyTheme();
+        this.bindEvents();
+    }
 
-function applyTheme(theme) {
-  if (theme === 'dark') {
-    body.classList.add('dark');
-    themeIcon.textContent = '🌞';
-  } else {
-    body.classList.remove('dark');
-    themeIcon.textContent = '🌙';
-  }
+    applyTheme() {
+        const html = document.documentElement;
+        const themeIcon = document.getElementById('themeIcon');
+        const themeText = document.querySelector('.theme-text');
+
+        html.setAttribute('data-theme', this.theme);
+
+        if (this.theme === 'dark') {
+            themeIcon.className = 'fas fa-sun';
+            if (themeText) themeText.textContent = 'Light';
+        } else {
+            themeIcon.className = 'fas fa-moon';
+            if (themeText) themeText.textContent = 'Dark';
+        }
+    }
+
+    toggleTheme() {
+        this.theme = this.theme === 'dark' ? 'light' : 'dark';
+        localStorage.setItem('cqrc_theme', this.theme);
+        this.applyTheme();
+    }
+
+    bindEvents() {
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            this.toggleTheme();
+        });
+    }
 }
 
-(function initTheme() {
-  const saved = localStorage.getItem('cqrc_theme');
-  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-  applyTheme(saved || (prefersDark ? 'dark' : 'light'));
-})();
+// Navigation Management
+class NavigationManager {
+    constructor() {
+        this.sidebar = document.getElementById('sidebar');
+        this.overlay = document.getElementById('mobileOverlay');
+        this.main = document.getElementById('main');
+        this.navLinks = Array.from(document.querySelectorAll('.nav-link'));
+        this.sections = this.navLinks.map(link => 
+            document.querySelector(link.getAttribute('href'))
+        ).filter(Boolean);
+        
+        this.bindEvents();
+        this.initScrollSpy();
+    }
 
-themeToggle.addEventListener('click', () => {
-  const next = body.classList.contains('dark') ? 'light' : 'dark';
-  localStorage.setItem('cqrc_theme', next);
-  applyTheme(next);
-});
+    bindEvents() {
+        // Mobile menu toggle
+        document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+            this.toggleSidebar();
+        });
 
-// Menu mobile
-const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-const sidebar = document.getElementById('sidebar');
-const overlay = document.getElementById('mobileOverlay');
+        // Overlay click
+        this.overlay.addEventListener('click', () => {
+            this.closeSidebar();
+        });
 
-function toggleSidebar(forceOpen = null) {
-  const open = forceOpen !== null ? forceOpen : !sidebar.classList.contains('open');
-  sidebar.classList.toggle('open', open);
-  overlay.classList.toggle('active', open);
-  document.getElementById('main').classList.toggle('full-width', !open);
+        // Nav link clicks
+        this.navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                if (window.innerWidth <= 768) {
+                    this.closeSidebar();
+                }
+            });
+        });
+
+        // Window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                this.closeSidebar();
+            }
+        });
+    }
+
+    toggleSidebar() {
+        this.sidebar.classList.toggle('open');
+        this.overlay.classList.toggle('active');
+        this.main.classList.toggle('full-width', !this.sidebar.classList.contains('open'));
+    }
+
+    closeSidebar() {
+        this.sidebar.classList.remove('open');
+        this.overlay.classList.remove('active');
+        this.main.classList.remove('full-width');
+    }
+
+    initScrollSpy() {
+        const onScroll = () => {
+            const fromTop = window.scrollY + 140;
+            let current = this.sections[0];
+
+            for (const section of this.sections) {
+                if (section && section.offsetTop <= fromTop) {
+                    current = section;
+                }
+            }
+
+            this.navLinks.forEach(link => link.classList.remove('active'));
+            
+            if (current) {
+                const activeLink = document.querySelector(`.nav-link[href="#${current.id}"]`);
+                if (activeLink) activeLink.classList.add('active');
+            }
+        };
+
+        document.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('load', onScroll);
+    }
 }
 
-mobileMenuBtn.addEventListener('click', () => toggleSidebar());
-overlay.addEventListener('click', () => toggleSidebar(false));
+// Progress Bar
+class ProgressBar {
+    constructor() {
+        this.progressBar = document.getElementById('progressBar');
+        this.bindEvents();
+    }
 
-// Scroll spy para destacar a seção ativa no menu
-const navLinks = Array.from(document.querySelectorAll('.nav-link'));
-const sections = navLinks.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
-
-function onScrollSpy() {
-  const fromTop = window.scrollY + 140; // compensar header
-  let current = sections[0];
-
-  for (const sec of sections) {
-    if (sec.offsetTop <= fromTop) current = sec;
-  }
-  navLinks.forEach(link => link.classList.remove('active'));
-  const active = document.querySelector(`.nav-link[href="#${current.id}"]`);
-  if (active) active.classList.add('active');
+    bindEvents() {
+        window.addEventListener('scroll', () => {
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrolled = window.scrollY;
+            const progress = Math.min((scrolled / docHeight) * 100, 100);
+            this.progressBar.style.width = `${progress}%`;
+        }, { passive: true });
+    }
 }
 
-document.addEventListener('scroll', onScrollSpy, { passive: true });
-window.addEventListener('load', onScrollSpy);
+// Back to Top Button
+class BackToTop {
+    constructor() {
+        this.button = document.getElementById('backToTop');
+        this.bindEvents();
+    }
 
-// Melhorar navegação (fecha menu ao clicar em item no mobile)
-navLinks.forEach(link => {
-  link.addEventListener('click', () => {
-    if (window.innerWidth <= 768) toggleSidebar(false);
-  });
+    bindEvents() {
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                this.button.classList.add('visible');
+            } else {
+                this.button.classList.remove('visible');
+            }
+        }, { passive: true });
+
+        this.button.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+}
+
+// Header Scroll Effect
+class HeaderScrollEffect {
+    constructor() {
+        this.header = document.getElementById('header');
+        this.bindEvents();
+    }
+
+    bindEvents() {
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                this.header.classList.add('scrolled');
+            } else {
+                this.header.classList.remove('scrolled');
+            }
+        }, { passive: true });
+    }
+}
+
+// Initialize everything when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    new ThemeManager();
+    new NavigationManager();
+    new ProgressBar();
+    new BackToTop();
+    new HeaderScrollEffect();
 });
 
-// 🚀 Scripts Adicionados
-
-// Barra de Progresso de Leitura
-const progressBar = document.getElementById('progressBar');
-window.addEventListener('scroll', () => {
-    const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-    const scrolled = window.scrollY;
-    const progress = (scrolled / docHeight) * 100;
-    progressBar.style.width = progress + '%';
-});
-
-// Botão de Voltar ao Topo
-const backToTopBtn = document.getElementById('backToTopBtn');
-window.addEventListener('scroll', () => {
-    if (window.scrollY > 300) {
-        backToTopBtn.style.display = 'block';
-    } else {
-        backToTopBtn.style.display = 'none';
-    }
-});
-
-backToTopBtn.addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+// Add smooth scrolling enhancement
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    });
 });
