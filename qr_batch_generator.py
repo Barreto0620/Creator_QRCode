@@ -15,9 +15,8 @@ except ImportError as e:
 
 # Lista fixa de links (serão usados caso não informe nada por argumento)
 DEFAULT_URLS = [
-    "#",
-    "#",
-    "#"
+    "https://github.com/WebCash-inc",
+    "https://www.youtube.com/channel/UC6r7L7-YDfUNHvxmXgq6DXQ"
 ]
 
 
